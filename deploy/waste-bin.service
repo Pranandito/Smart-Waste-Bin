@@ -1,0 +1,21 @@
+[Unit]
+Description=Waste bin device agent
+After=network-online.target time-sync.target mosquitto.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=orangepi
+WorkingDirectory=/opt/waste-bin
+EnvironmentFile=-/etc/waste-bin.env
+Environment=PYTHONUNBUFFERED=1
+StateDirectory=waste-bin
+ExecStart=/opt/waste-bin/.venv/bin/python waste-bin
+Restart=always
+RestartSec=5
+TimeoutStopSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
