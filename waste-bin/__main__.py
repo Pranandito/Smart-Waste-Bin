@@ -10,9 +10,11 @@ from .clock import NtpClock
 from .config import Settings, DeviceState
 from .mqtt_client import MqttClient
 from .protocol import Protocol
+from .sensors import DistanceSensorGroup
 from .services.info import InfoService
 from .services.remote_config import RemoteConfigService
 from .services.status import StatusService
+from .services.telemetry import TelemetryService
 
 log = logging.getLogger("waste_bin")
 
@@ -43,10 +45,15 @@ def main() -> int:
     # State persisten perangkat (interval telemetry, dsb.)
     state = DeviceState.load()
 
+    # Driver sensor jarak A02YYUW (3 kompartemen UART)
+    sensors = DistanceSensorGroup()
+
     # Daftarkan service di sini. Tiap service memasang Last Will / hook-nya sendiri.
     StatusService(mqtt, protocol)
     InfoService(mqtt, protocol)
     RemoteConfigService(mqtt, protocol, state)
+    telemetry = TelemetryService(mqtt, protocol, state, sensors, stop)
+    telemetry.start()
 
     mqtt.start()
     log.info("waste-bin fw=%s berjalan (device_id=%s)", settings.fw, settings.device_id)
@@ -55,6 +62,7 @@ def main() -> int:
         pass
 
     log.info("Berhenti")
+    sensors.close()
     mqtt.stop()
     return 0
 

@@ -1,6 +1,6 @@
 # waste-bin
 
-Agen MQTT untuk Orange Pi. Menangani koneksi ke broker, kanal `status` (online + Last Will), kanal `info` (keadaan perangkat), dan kanal `config` (konfigurasi remote persisten).
+Agen MQTT untuk Orange Pi. Menangani koneksi ke broker, kanal `status` (online + Last Will), kanal `info` (keadaan perangkat), kanal `config` (konfigurasi remote persisten), dan kanal `telemetry` (pembacaan berkala 3 sensor ultrasonik A02YYUW).
 
 ## Struktur
 
@@ -11,10 +11,12 @@ waste-bin/
 ├── clock.py             # waktu NTP (SNTP) -> ts ISO 8601
 ├── protocol.py          # format topic + payload
 ├── mqtt_client.py       # satu koneksi MQTT, LWT, hook on_connect/on_message, pub/sub
+├── sensors.py           # pembacaan 3 sensor ultrasonik A02YYUW & kalkulasi kapasitas
 └── services/
     ├── status.py        # kanal status (online + Last Will)
     ├── info.py          # kanal info (keadaan perangkat saat connect)
-    └── remote_config.py # kanal config (terima konfigurasi persisten)
+    ├── remote_config.py # kanal config (terima konfigurasi persisten)
+    └── telemetry.py     # kanal telemetry (publish berkala data sensor)
 deploy/
 ├── waste-bin.service
 └── waste-bin.env.example
